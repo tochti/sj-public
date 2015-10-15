@@ -2,6 +2,7 @@
 
 var app = angular.module('sj', [
   'ngRoute',
+  'AppServices',
   'AppCtrl',
 ]);
 
