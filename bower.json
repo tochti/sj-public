@@ -11,7 +11,8 @@
 		"angular": "1.4.6",
 	       	"angular-bootstrap": "0.13.4",
 		"angular-route": "1.4.6",
-		"angular-resource": "1.4.6"
+		"angular-resource": "1.4.6",
+		"angular-sauth": "git@github.com:rrawrriw/angular-sauth.git#v0.0.3"
 	}
 
 }
