@@ -9,13 +9,19 @@ var app = angular.module('sj', [
 
 app.config(['$routeProvider',
   function($routeProvider) {
-    $routeProvider.
-      when('/overview', {
-	      templateURL: '/public/angular-tpls/overview.html',
+    $routeProvider
+      .when('/signIn', {
+        templateUrl: '/public/angular-tpls/signIn.html',
+        controller: 'SignInCtrl',
+      })
+      .when('/overview', {
+	      templateUrl: '/public/angular-tpls/overview.html',
 	      controller: 'OverviewCtrl',
-      }).when('/series/:id', {
+      })
+      .when('/series/:id', {
         templateUrl: '/public/angular-tpls/series.html',
         controller: 'SeriesCtrl',
-      }).otherwise('/overview');
+      })
+      .otherwise('/signIn');
   }
 ]);
