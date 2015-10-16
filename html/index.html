@@ -21,11 +21,11 @@
   </head>
  
   <body>
-    <div class="alert alert-danger" ng-show="globalError.show">
-      <ul ng-repeat="err in globalError.msg">
+    <div class="alert alert-warning alert-dismissible" ng-show="globalError.show">
+      <button type="button" class="close" aria-label="Close" ng-click="globalError.close()">&times;</button>
+      <ul id="global-error-msg" ng-repeat="err in globalError.msg">
         <li>{{err}}</li>
       </ul>
-      <a ng-click="globalError.close()">&times;</a>
     </div>
     <div id="main" ng-view></div>
   </body>

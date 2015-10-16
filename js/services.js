@@ -27,7 +27,7 @@ appServices.factory('User', [
         return this._id;
       },
 
-      login: function (id) {
+      signIn: function (id) {
         this._id = id;
         this._state = true;
       },
@@ -245,7 +245,8 @@ appServices.factory('G', [
   '$rootScope',
   '$http',
   '$q',
-  function ($rootScope, $http, $q) {
+  '$location',
+  function ($rootScope, $http, $q, $location) {
     return {
       // Expect user to have a id() string function
       readSeriesOfUser: function (user) {
@@ -285,8 +286,13 @@ appServices.factory('G', [
         }
 
         setTimeout(function () {
-          $rootScope.globalError.show = false;
+          $rootScope.globalError.close();
+          $rootScope.$apply();
         }, 15 * 1000);
+      },
+
+      go2: function (url) {
+        $location.url(url);
       }
     }
   }

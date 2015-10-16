@@ -14,6 +14,10 @@ app.config(['$routeProvider',
         templateUrl: '/public/angular-tpls/signIn.html',
         controller: 'SignInCtrl',
       })
+      .when('/registrate', {
+        templateUrl: '/public/angular-tpls/registrate.html',
+        controller: 'RegistrateCtrl',
+      })
       .when('/overview', {
 	      templateUrl: '/public/angular-tpls/overview.html',
 	      controller: 'OverviewCtrl',
