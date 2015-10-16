@@ -2,7 +2,7 @@
 <html lang="de" ng-app="sj">
   <head>
     <meta charset="utf-8">
-    <meta name="author" content="gr">
+    <meta name="Tim Tochtermann" content="gr">
     <title>serienjunkie candyman</title>
     <link href="public/ext/bootstrap/dist/css/bootstrap.min.css" 
           rel="stylesheet" type="text/css">
@@ -13,6 +13,7 @@
     <script src="public/ext/angular-route/angular-route.min.js"></script>
     <script src="public/ext/angular-resource/angular-resource.min.js"></script>
     <script src="public/ext/angular-bootstrap/ui-bootstrap.min.js"></script>
+    <script src="public/ext/angular-sauth/angular-sauth.js"></script>
     <script src="public/js/main.js"></script>
     <script src="public/js/directives.js"></script>
     <script src="public/js/services.js"></script>
@@ -20,6 +21,12 @@
   </head>
  
   <body>
+    <div class="alert alert-danger" ng-show="globalError.show">
+      <ul ng-repeat="err in globalError.msg">
+        <li>{{err}}</li>
+      </ul>
+      <a ng-click="globalError.close()">&times;</a>
+    </div>
     <div id="main" ng-view></div>
   </body>
 

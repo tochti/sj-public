@@ -241,8 +241,11 @@ appServices.factory('Shelf', [
   }
 ]);
 
-appServices.factory('G', ['$http', '$q',
-  function ($http, $q) {
+appServices.factory('G', [
+  '$rootScope',
+  '$http',
+  '$q',
+  function ($rootScope, $http, $q) {
     return {
       // Expect user to have a id() string function
       readSeriesOfUser: function (user) {
@@ -267,6 +270,24 @@ appServices.factory('G', ['$http', '$q',
 
         return d.promise;
       },
+      
+      error: function (msgs) {
+        if (msgs.constructor !== Array) {
+          msgs = [msgs];
+        }
+
+        $rootScope.globalError = {
+          show: true,
+          msg: msgs,
+          close: function () {
+            this.show = false;
+          }
+        }
+
+        setTimeout(function () {
+          $rootScope.globalError.show = false;
+        }, 15 * 1000);
+      }
     }
   }
 ]);
