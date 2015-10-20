@@ -10,6 +10,7 @@ module.exports = function(config){
       'ext/angular-route/angular-route.js',
       'ext/angular-resource/angular-resource.js',
       'ext/angular-bootstrap/ui-bootstrap.min.js',
+      'ext/angular-sauth/angular-sauth.js',
       'js/*.js',
       'test/unit/**/*.js'
     ],
