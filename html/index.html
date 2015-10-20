@@ -12,7 +12,7 @@
     <script src="public/ext/angular/angular.min.js"></script>
     <script src="public/ext/angular-route/angular-route.min.js"></script>
     <script src="public/ext/angular-resource/angular-resource.min.js"></script>
-    <script src="public/ext/angular-bootstrap/ui-bootstrap.min.js"></script>
+    <script src="public/ext/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
     <script src="public/ext/angular-sauth/angular-sauth.js"></script>
     <script src="public/js/main.js"></script>
     <script src="public/js/directives.js"></script>
@@ -23,11 +23,11 @@
   <body>
     <div class="alert alert-warning alert-dismissible" ng-show="globalError.show">
       <button type="button" class="close" aria-label="Close" ng-click="globalError.close()">&times;</button>
-      <ul id="global-error-msg" ng-repeat="err in globalError.msg">
-        <li>{{err}}</li>
+      <ul id="global-error-msg">
+        <li ng-repeat="err in globalError.msg">{{err}}</li>
       </ul>
     </div>
-    <div id="main" ng-view></div>
+    <div id="page" ng-view></div>
   </body>
 
 </html>
