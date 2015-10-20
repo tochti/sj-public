@@ -1,8 +1,8 @@
 {
   "version": "0.0.0",
   "private": true,
-  "name": "bebber-public",
-  "description": "Frontend for bebber",
+  "name": "sj",
+  "description": "Frontend Serien-Junkie Candyman",
   "repository": "https://github.com/rrawrriw/bebberPublic",
   "license": "MIT",
   "devDependencies": {
