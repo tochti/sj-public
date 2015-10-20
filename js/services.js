@@ -68,7 +68,7 @@ appServices.factory('Series', ['$http', '$q',
 
       var series = {
         _urlPrefix: '/Series',
-        _id: '',
+        _id: data.ID || '',
         _title: data.Title,
         _image: data.Image,
         _desc: data.Desc,
@@ -109,6 +109,17 @@ appServices.factory('Series', ['$http', '$q',
           $http.post(url, req).then(success, error);
 
           return d.promise;
+        },
+
+        data: function () {
+          return {
+            ID: this._id,
+            Title: this._title,
+            Image: this._image,
+            Desc: this._desc,
+            Episodes: this._episodes,
+            Portal: this._portal,
+          }
         },
 
         remove: function () {
@@ -246,20 +257,29 @@ appServices.factory('G', [
   '$http',
   '$q',
   '$location',
-  function ($rootScope, $http, $q, $location) {
+  'Series',
+  function ($rootScope, $http, $q, $location, Series) {
     return {
-      // Expect user to have a id() string function
-      readSeriesOfUser: function (user) {
+      readSeriesOfUser: function () {
+        var series = Series;
+        var sList = [];
         var d = $q.defer();
 
-        var url = '/SeriesOfUser/'+ user.id();
+        var url = '/SeriesOfUser';
         var success = function (resp) {
           if (resp.data.Status !== 'success') {
             d.reject(resp);
             return
           }
 
-          d.resolve(resp);
+          angular.forEach(resp.data.Data, function (val, index) {
+            sList.push(new series(val));
+          });
+
+
+          console.log(sList);
+          d.resolve(sList);
+          return
 
         }
         

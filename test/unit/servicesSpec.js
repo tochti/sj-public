@@ -36,13 +36,13 @@ describe('Services', function() {
     });
 
     it('should have id method', function () {
-      $s.user.login('123');
+      $s.user.signIn('123');
       expect($s.user.id()).toBe('123');
     });
 
-    it('loggin user', function () {
+    it('signIn user', function () {
       expect($s.user.signedIn()).toBe(false);
-      $s.user.login('123');
+      $s.user.signIn('123');
       expect($s.user.signedIn()).toBe(true);
     });
 
@@ -69,6 +69,7 @@ describe('Services', function() {
       seriesRescURL = 'http://imdb.com/mr+robot';
       seriesID = "123";
       seriesData = {
+        ID: seriesID,
         Title: seriesTitle,
         Image: {
           Name: seriesRescName,
@@ -104,6 +105,13 @@ describe('Services', function() {
 
       $httpBackend.flush();
       $s.$apply();
+
+      var d = series.data();
+      expect(d['Title']).toBeDefined();
+      expect(d['Image']).toBeDefined();
+      expect(d['Portal']).toBeDefined();
+      expect(d['Desc']).toBeDefined();
+      expect(d['Episodes']).toBeDefined();
 
       $httpBackend
         .expectDELETE('/Series/'+ seriesID)
@@ -203,25 +211,22 @@ describe('Services', function() {
         $rootScope = $injector.get('$rootScope');
         $s = $rootScope.$new();
         $s.g = $injector.get('G');
-        $s.series = $injector.get('Series');
-        userID = '1';
-        $s.user = $injector.get('User');
-        $s.user.setup({
-          name: 'why',
-          pass: '123',
-        });
-        $s.user.login(userID);
-
+        $s.Series = $injector.get('Series');
       }));
 
       it('should return all series of a user', function (done) {
         var expectResp = {'Status': 'success', 'Data': [{'Title': 'Mr. Robot'}]};
         $httpBackend
-          .expectGET('/SeriesOfUser/'+ userID)
+          .expectGET('/SeriesOfUser')
           .respond(expectResp);
 
-        $s.g.readSeriesOfUser($s.user).then(function (resp) {
-          expect(resp.data).toEqual(expectResp);
+        $s.g.readSeriesOfUser().then(function (sList) {
+          var result = [
+            new $s.Series({
+              Title: 'Mr. Robot',
+            })
+          ];
+          expect(sList).toEqual(result);
           done();
         });
 

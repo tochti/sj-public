@@ -1,0 +1,10 @@
+<div class="container">
+  <ul>
+    <li>
+      <span ng-click="newSeries()">new</span>
+    </li>
+    <li ng-repeat="series in shelf.list()">
+      {{series.data().Title}} <span class="glyphicon glyphicon-remove-circle" ng-click="removeSeries()"></span>
+    </li>
+  </ul>
+</div>
