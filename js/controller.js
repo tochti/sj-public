@@ -25,12 +25,10 @@ appCtrl.controller('SignInCtrl', [
       });
 
       var success = function (resp) {
-        console.log(resp);
         $location.url('/overview')
       }
 
       var error = function (resp) {
-        console.log(resp);
         $scope.g.error(resp.data.Err);
       }
 
@@ -50,7 +48,6 @@ appCtrl.controller('RegistrateCtrl', [
     $scope.g = G;
 
     $scope.newUser = function () {
-      console.log('test');
       var url = '/User';
       var resp = {
         Data: {
@@ -59,7 +56,6 @@ appCtrl.controller('RegistrateCtrl', [
         },
       };
       var success = function (resp) {
-        console.log(resp);
         if (resp.data.Status !== 'success') {
           $scope.g.error(resp.data.Err);
           return
@@ -70,7 +66,6 @@ appCtrl.controller('RegistrateCtrl', [
       }
 
       var fail = function (resp) {
-        console.log(resp);
         $scope.g.error(resp.data.Err);
       }
 
@@ -80,8 +75,7 @@ appCtrl.controller('RegistrateCtrl', [
   }
 ]);
 
-
-appCtrl.controller('OverviewCtrl', [
+appCtrl.controller('PageCtrl', [
   '$scope',
   '$uibModal',
   'User',
@@ -89,37 +83,9 @@ appCtrl.controller('OverviewCtrl', [
   'Shelf',
   'G',
   function ($scope, $uibModal, User, Series, Shelf, G) {
-    $scope.user = User;
-    $scope.shelf = Shelf;
     $scope.Series = Series;
-    $scope.g = G;
-
-    var init = function () {
-      var success = function (sList) {
-        if (!$scope.shelf.appendBatch(sList)) {
-          $scope.g.error('Cannot add sereis '+ s +' to list');
-        }
-      }
-
-      var error = function (resp) {
-        console.log(resp.data.Err)
-      }
-
-      $scope.g.readSeriesOfUser($scope.user)
-        .then(success, error);
-    }
-
-    $scope.removeSeries = function () {
-      var that = this;
-      this.series.remove().then(
-          function () {
-            $scope.shelf.remove(that.series.id());
-          },
-          function (resp) {
-            $scope.g.error(resp.data.Err);
-          }
-      );
-    }
+    var shelf = Shelf;
+    var seriesShelf = shelf.read('series');
 
     $scope.newSeries = function () {
       var modal = $uibModal.open({
@@ -128,11 +94,10 @@ appCtrl.controller('OverviewCtrl', [
       });
 
       var newSeries = function (data) {
-        console.log(data);
         var s = new $scope.Series(data);
 
         var success = function (resp) {
-          if (!$scope.shelf.append(s)) {
+          if (!seriesShelf.append(s)) {
             $scope.g.error('Cannot add series '+ s.Title +' to list');
             s.remove().then(function (){},
               function (resp) {     
@@ -151,7 +116,102 @@ appCtrl.controller('OverviewCtrl', [
       modal.result.then(newSeries);
     }
 
+  }
+])
+
+
+appCtrl.controller('OverviewCtrl', [
+  '$scope',
+  '$uibModal',
+  'User',
+  'Series',
+  'Shelf',
+  'G',
+  'LastWatched',
+  function ($scope, $uibModal, User, Series, Shelf, G, LastWatched) {
+    var shelf = Shelf;
+
+    $scope.seriesShelf = shelf.read("series");
+    $scope.watchedShelf = shelf.read("watched");
+    $scope.user = User;
+    $scope.Series = Series;
+    $scope.g = G;
+
+    var init = function () {
+      var error = function (resp) {
+        $scope.g.error(resp.data.Err);
+      }
+
+      var success = function (sList) {
+        if (!$scope.seriesShelf.appendBatch(sList)) {
+          $scope.g.error('Cannot add '+ sList);
+        }
+      }
+
+      $scope.g.readSeriesOfUser()
+        .then(success, error);
+
+
+      var success = function (wList) {
+        if (!$scope.watchedShelf.appendBatch(wList)) {
+          $scope.g.error('Cannot add '+ wList);
+        }
+      }
+
+      $scope.g.readLastWatchedOfUser()
+        .then(success, error);
+    }
+
+    $scope.removeSeries = function () {
+      var that = this;
+      this.series.remove().then(
+          function () {
+            $scope.seriesShelf.remove(that.series.id());
+          },
+          function (resp) {
+            $scope.g.error(resp.data.Err);
+          }
+      );
+    }
+
+    $scope.updateSeries = function () {
+      var that = this;
+      var modal = $uibModal.open({
+        templateUrl: '/public/angular-tpls/updateSeries.html',
+        controller: 'UpdateSeriesCtrl',
+        resolve: {
+          series: function () {
+            return that.series; 
+          }
+        }
+      });
+
+      var updateSeries = function (data) {
+        data.SeriesID = that.series.id();
+        var watched = new LastWatched(data);
+
+        var success = function (resp) {
+          if (!$scope.watchedShelf.append(watched)) {
+            $scope.g.error('Cannot add data watched data to list');
+            watched.remove().then(function (){},
+              function (resp) {     
+                $scope.g.error(resp.data.Err); 
+              }
+            );
+          }
+        }
+
+        var error = function (resp) {
+          $scope.g.error(resp.data.Err);
+        }
+        watched.save().then(success, error);
+      }
+
+      modal.result.then(updateSeries);
+    }
+
     init();
+
 
   }
 ]);
@@ -163,22 +223,7 @@ appCtrl.controller('NewSeriesCtrl', [
     var readSeriesData = function () {
       var d = {
         Title: $scope.title,
-        Image: {
-          Name: 'imdb.com',
-          URL: $scope.image,
-        },
-        Portal: {
-          Name: 'kinox.to',
-          URL: $scope.episodes,
-        },
-        Episodes: {
-          Name: 'kinox.to',
-          URL: $scope.episodes,
-        },
-        Desc: {
-          Name: 'imdb.com',
-          URL: $scope.image,
-        },
+        Image: $scope.image,
       };
 
       return d;
@@ -195,7 +240,29 @@ appCtrl.controller('NewSeriesCtrl', [
   }
 ]);
 
-appCtrl.controller('SeriesCtrl', [
-  function () {}
+appCtrl.controller('UpdateSeriesCtrl', [
+  '$scope',
+  '$modalInstance',
+  'series',
+  function ($scope, $modalInstance, series) {
+    $scope.series = series;
+    var readUpdateData = function () {
+      var d = {
+        Session: $scope.session,
+        Episode: $scope.episode,
+      };
+
+      return d;
+    }
+
+    $scope.cancel = function () {
+      $modalInstance.dismiss('cancel');
+    }
+
+    $scope.close = function () {
+      var data = readUpdateData();
+      $modalInstance.close(data);
+    }
+  }
 ]);
 

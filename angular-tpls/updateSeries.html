@@ -1,16 +1,17 @@
 <div class="modal-header">
   <button type="button" class="close" ng-click="cancel()"><span >&times;</span></button>
-  <h4 class="modal-title" id="myModalLabel">New series</h4>
+  <h4 class="modal-title" id="myModalLabel">Update series</h4>
 </div>
 <div class="modal-body">
+  <h2 class="series-title">{{ series.data().Title }}</h2>
   <form>
     <div class="form-group">
-      <label for="title">Title</label>
-      <input type="text" class="form-control" id="title" placeholder="Title" ng-model="title">
+      <label for="title">Last session</label>
+      <input type="text" class="form-control" id="title" placeholder="Last session" ng-model="session">
     </div>
     <div class="form-group">
-      <label for="title">Image</label>
-      <input type="text" class="form-control" id="image" placeholder="Image" ng-model="image">
+      <label for="title">Last episode</label>
+      <input type="text" class="form-control" id="image" placeholder="Last episode" ng-model="episode">
     </div>
   </form>
 </div>

@@ -54,9 +54,8 @@ describe('Services', function() {
         $s,
         $httpBackend,
         seriesTitle,
-        seriesRescName,
-        seriesRescURL,
         seriesID,
+        seriesImage,
         seriesData;
 
     beforeEach(inject(function ($injector) {
@@ -64,29 +63,13 @@ describe('Services', function() {
       $rootScope = $injector.get('$rootScope');
       $s = $rootScope.$new();
       $s.Series = $injector.get('Series');
+      seriesID = '123';
       seriesTitle = 'Mr. Robot';
-      seriesRescName = 'imdb.com';
-      seriesRescURL = 'http://imdb.com/mr+robot';
-      seriesID = "123";
+      seriesImage = 'robot.png'
       seriesData = {
         ID: seriesID,
         Title: seriesTitle,
-        Image: {
-          Name: seriesRescName,
-          URL: seriesRescURL,
-        },
-        Desc: {
-          Name: seriesRescName,
-          URL: seriesRescURL,
-        },
-        Episodes: {
-          Name: seriesRescName,
-          URL: seriesRescURL,
-        },
-        Portal: {
-          Name: seriesRescName,
-          URL: seriesRescURL,
-        }
+        Image: seriesImage,
       };
 
     }));
@@ -109,9 +92,6 @@ describe('Services', function() {
       var d = series.data();
       expect(d['Title']).toBeDefined();
       expect(d['Image']).toBeDefined();
-      expect(d['Portal']).toBeDefined();
-      expect(d['Desc']).toBeDefined();
-      expect(d['Episodes']).toBeDefined();
 
       $httpBackend
         .expectDELETE('/Series/'+ seriesID)
@@ -171,14 +151,16 @@ describe('Services', function() {
       });
       var objs = [obj1, obj2]
 
-      expect($s.shelf.append(objs)).toBe(true);
-      expect($s.shelf.list()).toEqual(objs);
+      var shelf = $s.shelf.read('test');
 
-      var o = $s.shelf.remove(obj1.id());
+      expect(shelf.append(objs)).toBe(true);
+      expect(shelf.list()).toEqual(objs);
+
+      var o = shelf.remove(obj1.id());
       expect(o).toEqual(obj1);
-      expect($s.shelf.list()).toEqual([obj2]);
+      expect(shelf.list()).toEqual([obj2]);
 
-      o = $s.shelf.read(obj2.id());
+      o = shelf.read(obj2.id());
       expect(o).toEqual(obj2);
 
       var updated = new O({
@@ -187,11 +169,11 @@ describe('Services', function() {
           Name: "TWO",
         },
       });
-      $s.shelf.update(obj2.id(), updated);
-      o = $s.shelf.read(obj2.id());
+      shelf.update(obj2.id(), updated);
+      o = shelf.read(obj2.id());
       expect(o.data()).toEqual(updated.data());
 
-      var r = $s.shelf.find('Name', 'T');
+      var r = shelf.find('Name', 'T');
       expect(r).toEqual([updated]);
 
     });
@@ -199,12 +181,11 @@ describe('Services', function() {
   });
 
   describe('G', function () {
-    var $httpBackend,
-      $s,
-      $rootScope,
-      userID;
 
     describe('readSeriesOfUser', function () {
+      var $httpBackend,
+        $s,
+        $rootScope;
 
       beforeEach(inject(function ($injector) {
         $httpBackend = $injector.get('$httpBackend');
@@ -217,7 +198,7 @@ describe('Services', function() {
       it('should return all series of a user', function (done) {
         var expectResp = {'Status': 'success', 'Data': [{'Title': 'Mr. Robot'}]};
         $httpBackend
-          .expectGET('/SeriesOfUser')
+          .expectGET('/ReadSeriesList')
           .respond(expectResp);
 
         $s.g.readSeriesOfUser().then(function (sList) {
@@ -227,6 +208,38 @@ describe('Services', function() {
             })
           ];
           expect(sList).toEqual(result);
+          done();
+        });
+
+        $httpBackend.flush();
+        $s.$apply();
+
+      });
+
+    });
+
+    describe('lastWatchedOfUser', function () {
+
+      var $httpBackend, 
+        $scope,
+        g,
+        LastWatched;
+
+      beforeEach(inject(function ($injector) {
+        $httpBackend = $injector.get('$httpBackend');
+        $scope = $injector.get('$rootScope').$new();
+        g = $injector.get('G');
+        LastWatched = $injector.get('LastWatched');
+      }));
+
+      it('should return all last watched data of a user', function (done) {
+        var expectResp = {'Status': 'success', 'Data': [{'SeriesID': 1}]};
+        $httpBackend
+          .expectGET('/LastWatchedList')
+          .respond(expectResp);
+
+        g.readLastWatchedOfUser().then(function (wList) {
+          expect(wList[0].data().SeriesID).toEqual(1);
           done();
         });
 

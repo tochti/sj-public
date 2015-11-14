@@ -51,10 +51,7 @@ appServices.factory('Series', ['$http', '$q',
       }
 
       if (data.Title === undefined ||
-          data.Image === undefined || 
-          data.Desc === undefined || 
-          data.Episodes === undefined ||
-          data.Portal === undefined) {
+          data.Image === undefined) {
         return false
       }
 
@@ -71,9 +68,6 @@ appServices.factory('Series', ['$http', '$q',
         _id: data.ID || '',
         _title: data.Title,
         _image: data.Image,
-        _desc: data.Desc,
-        _episodes: data.Episodes,
-        _portal: data.Portal,
 
         id: function () {
           return this._id;
@@ -101,9 +95,6 @@ appServices.factory('Series', ['$http', '$q',
             Data: {
               Title: this._title,
               Image: this._image,
-              Desc: this._desc,
-              Episodes: this._episodes,
-              Portal: this._portal,
             },
           }
           $http.post(url, req).then(success, error);
@@ -116,9 +107,6 @@ appServices.factory('Series', ['$http', '$q',
             ID: this._id,
             Title: this._title,
             Image: this._image,
-            Desc: this._desc,
-            Episodes: this._episodes,
-            Portal: this._portal,
           }
         },
 
@@ -155,99 +143,163 @@ appServices.factory('Series', ['$http', '$q',
 // Verwaltet eine Liste von Objekten
 appServices.factory('Shelf', [
   function () {
+    var Shelf = function () {
+      return {
+        _objs: [],
+        // Fügt ein Objekt der Liste hinzu
+        // Das Objekt welches hinzugefügt wird muss folgende Funktionen besitzen
+        // id() string
+        // data() {}
+        //
+        // append(obj {}) bool
+        append: function (obj) {
+          if (obj.constructor === Array) {
+            return this.appendBatch(obj);
+          }
+
+          return this.appendOne(obj);
+
+        },
+        appendBatch: function (objs) {
+          var that = this;
+          var ok = true;
+
+          angular.forEach(objs, function (val, i) {
+            var r = that.appendOne(val);
+            if (!r) {
+              ok = false;
+              return;
+            }
+          });
+
+          return ok;
+        },
+        appendOne: function (obj) {
+          if (typeof obj.id !== 'function' || typeof obj.data !== 'function') {
+            return false
+          }
+
+          this._objs.push(obj);
+          return true
+        },
+        // Entfernt ein Objekt mit der id X aus der Liste
+        // 
+        // remove(id string) {...}
+        remove: function (id) {
+          var found = [];
+          var index = this.indexOfId(id);
+          if (index === -1) {
+            return {}
+          }
+
+          return this._objs.splice(index, 1)[0];
+        },
+        // Ersetzte ein Objekt durch ein geupdateds Objekt 
+        update: function (id, updatedObj) {
+          var i = this.indexOfId(id);
+          this._objs[i] = updatedObj;
+        },
+        // Findet die Position eines Objekts mit der id X
+        indexOfId: function (id) {
+          var found = -1;
+          angular.forEach(this._objs, function (val, index) {
+            if (id === val.id()) {
+              found = index;
+              return;
+            }
+          });
+
+          return found;
+        },
+        // Gibt das Objekt mit der id X zurück
+        read: function (id) {
+          var i = this.indexOfId(id);
+          if (i === -1) {
+            return {}
+          }
+
+          return this._objs[i];
+        },
+        // Gibt ein Array mit allen Objekten zurück
+        list: function () {
+          return this._objs;
+        },
+        // Findet ein Liste mit Objekten zurück im Feld X das Pattern Y haben.
+        find: function(field, pattern) {
+          var regx = new RegExp(pattern, 'i');
+          var found = [];
+
+          angular.forEach(this._objs, function (val, i) {
+            if (val.data()[field].match(regx)) {
+              found.push(val);
+            }
+          });
+
+          return found;
+        },
+      }
+    };
+
     return {
-      _objs: [],
-      // Fügt ein Objekt der Liste hinzu
-      // Das Objekt welches hinzugefügt wird muss folgende Funktionen besitzen
-      // id() string
-      // data() {}
-      //
-      // append(obj {}) bool
-      append: function (obj) {
-        if (obj.constructor === Array) {
-          return this.appendBatch(obj);
+      _shelfs: {},
+      read: function (name) {
+        if (this._shelfs[name] === undefined) {
+          this._shelfs[name] = new Shelf();
         }
 
-        return this.appendOne(obj);
+        return this._shelfs[name];
+      }
+    }
 
-      },
-      appendBatch: function (objs) {
-        var that = this;
-        var ok = true;
+  }
+]);
 
-        angular.forEach(objs, function (val, i) {
-          var r = that.appendOne(val);
-          if (!r) {
-            ok = false;
-            return;
+appServices.factory('LastWatched', [
+  '$http',
+  '$q',
+  function ($http, $q) {
+     return function (data) {
+      return {
+        _id: data.SeriesID,
+        _session: data.Session,
+        _episode: data.Episode,
+        id: function () {
+          return this._id;
+        },
+        data: function () {
+          return {
+            SeriesID: this._id,
+            Session: parseInt(this._session),
+            Episode: parseInt(this._episode),
           }
-        });
+        },
+        save: function () {
+          var that = this;
+          var d = $q.defer();
 
-        return ok;
-      },
-      appendOne: function (obj) {
-        if (typeof obj.id !== 'function' || typeof obj.data !== 'function') {
-          return false
-        }
+          var success = function (resp) {
+            if (resp.data.Status === 'success') {
+              that._id = resp.data.Data.ID;
+              d.resolve(resp);
+            }
 
-        this._objs.push(obj);
-        return true
-      },
-      // Entfernt ein Objekt mit der id X aus der Liste
-      // 
-      // remove(id string) {...}
-      remove: function (id) {
-        var found = [];
-        var index = this.indexOfId(id);
-        if (index === -1) {
-          return {}
-        }
-
-        return this._objs.splice(index, 1)[0];
-      },
-      // Ersetzte ein Objekt durch ein geupdateds Objekt 
-      update: function (id, updatedObj) {
-        var i = this.indexOfId(id);
-        this._objs[i] = updatedObj;
-      },
-      // Findet die Position eines Objekts mit der id X
-      indexOfId: function (id) {
-        var found = -1;
-        angular.forEach(this._objs, function (val, index) {
-          if (id === val.id()) {
-            found = index;
-            return;
+            d.reject(resp);
           }
-        });
 
-        return found;
-      },
-      // Gibt das Objekt mit der id X zurück
-      read: function (id) {
-        var i = this.indexOfId(id);
-        if (i === -1) {
-          return {}
-        }
-
-        return this._objs[i];
-      },
-      // Gibt ein Array mit allen Objekten zurück
-      list: function () {
-        return this._objs;
-      },
-      // Findet ein Liste mit Objekten zurück im Feld X das Pattern Y haben.
-      find: function(field, pattern) {
-        var regx = new RegExp(pattern, 'i');
-        var found = [];
-
-        angular.forEach(this._objs, function (val, i) {
-          if (val.data()[field].match(regx)) {
-            found.push(val);
+          var error = function (resp) {
+            d.reject(resp);
           }
-        });
 
-        return found;
-      },
+          var url = '/LastWatched';
+          var req = {
+            Data: this.data(),
+          };
+          $http.post(url, req).then(success, error);
+
+          return d.promise;
+        },
+
+      }
     }
   }
 ]);
@@ -258,14 +310,44 @@ appServices.factory('G', [
   '$q',
   '$location',
   'Series',
-  function ($rootScope, $http, $q, $location, Series) {
+  'LastWatched',
+  function ($rootScope, $http, $q, $location, Series, LastWatched) {
     return {
+      readLastWatchedOfUser: function () {
+        var wList = [];
+        var d = $q.defer();
+
+        var url = '/LastWatchedList'
+        var success = function (resp) {
+          if (resp.data.Status !== 'success') {
+            d.reject(resp);
+            return
+          }
+
+          angular.forEach(resp.data.Data, function (val, index) {
+            wList.push(new LastWatched(val));
+          });
+
+
+          d.resolve(wList);
+          return
+        };
+
+        var error = function (resp) {
+          d.reject(resp);
+        }
+
+        $http.get(url).then(success, error);
+
+        return d.promise;
+      },
+
       readSeriesOfUser: function () {
         var series = Series;
         var sList = [];
         var d = $q.defer();
 
-        var url = '/SeriesOfUser';
+        var url = '/ReadSeriesList';
         var success = function (resp) {
           if (resp.data.Status !== 'success') {
             d.reject(resp);
@@ -277,7 +359,6 @@ appServices.factory('G', [
           });
 
 
-          console.log(sList);
           d.resolve(sList);
           return
 

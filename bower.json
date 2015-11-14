@@ -12,7 +12,7 @@
 	       	"angular-bootstrap": "0.14.2",
 		"angular-route": "1.4.7",
 		"angular-resource": "1.4.7",
-		"angular-sauth": "git@github.com:rrawrriw/angular-sauth.git#v0.0.5"
+		"angular-sauth": "git@github.com:tochti/angular-sauth.git#v0.0.6"
 	}
 
 }

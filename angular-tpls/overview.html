@@ -1,10 +1,13 @@
 <div class="container">
-  <ul>
-    <li>
-      <span ng-click="newSeries()">new</span>
-    </li>
-    <li ng-repeat="series in shelf.list()">
-      {{series.data().Title}} <span class="glyphicon glyphicon-remove-circle" ng-click="removeSeries()"></span>
+  <ul id="series-list">
+    <li class="series" ng-repeat="series in seriesShelf.list()">
+      <div class="series-menu">
+        <p class="last-session">{{ watchedShelf.read(series.id()).data().Session }}</p>
+        <p class="last-episode">{{ watchedShelf.read(series.id()).data().Episode }}</p>
+        <a class="series-remove" ng-click="removeSeries()"><span class="glyphicon glyphicon-remove-circle"></span></a>
+        <a class="series-update" ng-click="updateSeries()"><span class="glyphicon glyphicon-eye-open"></span></a>
+      </div>
+      <img class="series-image" src="/images/{{ series.data().Image }}">
     </li>
   </ul>
 </div>

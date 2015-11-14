@@ -1,2 +1,80 @@
 /*_*/
 
+body {
+  background: #568a9b;
+}
+
+#series-list {
+  overflow: hidden;
+  list-style: none;
+}
+
+.series {
+  float: left;
+  margin-right: 2em; 
+  border: 2px solid #b076af;
+  border-radius: 4px;
+  padding: 5px;
+  background: #5d5d5d;
+  width: 214px;
+}
+
+.series-image {
+  width: 200px;
+}
+
+.series-remove {
+  float: right;
+  color: #568a9b;
+  margin-right: 5px;
+}
+
+.series-title {
+  margin-top: 0;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.series-update {
+  float: right;
+  margin-right: 5px;
+  font-size: 15px;
+}
+
+.series-menu {
+  position: absolute;
+  width: 200px;
+  background: #5d5d5d;
+  opacity: 0.9; 
+  z-index: 100;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  padding-left: 5px;
+  overflow: hidden;
+}
+
+.last-episode,
+.last-session {
+  display: inline;
+  float: left;
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+  margin-left: 5px;
+}
+
+.navbar-default {
+  border-radius: 0;
+  background: #5d5d5d;
+  border: none;
+}
+
+.navbar-brand {
+  color: #fff !important;
+}
+
+#new-series {
+  color: #b076af !important;
+  cursor: pointer;
+}
+
