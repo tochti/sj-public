@@ -5,6 +5,13 @@ body {
   color: #5d5d5d;
 }
 
+#global-error {
+  width: 100%;
+  position: absolute;
+  border-radius: 0; 
+  z-index: 150;
+}
+
 #series-list {
   overflow: hidden;
   list-style: none;

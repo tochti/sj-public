@@ -138,6 +138,11 @@ appCtrl.controller('OverviewCtrl', [
     $scope.g = G;
 
     var init = function () {
+      console.log($scope.user);
+      if (!$scope.user.signedIn()) {
+        $scope.g.go2("/signIn");
+      }
+
       var error = function (resp) {
         $scope.g.error(resp.data.Err);
       }
