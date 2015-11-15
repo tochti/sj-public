@@ -264,9 +264,11 @@ appServices.factory('LastWatched', [
         _id: data.SeriesID,
         _session: data.Session,
         _episode: data.Episode,
+
         id: function () {
           return this._id;
         },
+
         data: function () {
           return {
             SeriesID: this._id,
@@ -274,6 +276,7 @@ appServices.factory('LastWatched', [
             Episode: parseInt(this._episode),
           }
         },
+
         save: function () {
           var that = this;
           var d = $q.defer();

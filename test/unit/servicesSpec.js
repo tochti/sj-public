@@ -77,7 +77,14 @@ describe('Services', function() {
     it('crud series', function (done) {
       $httpBackend
         .expectPOST('/Series')
-        .respond({'Status': 'success', 'Data': {'ID': seriesID}});
+        .respond({
+          'Status': 'success', 
+          'Data': {
+            'ID': seriesID,
+            'Image': seriesImage,
+            'Title': seriesTitle
+          }
+        });
 
       var series = new $s.Series(seriesData);
       series.save().then(
@@ -90,6 +97,7 @@ describe('Services', function() {
       $s.$apply();
 
       var d = series.data();
+      console.log(d);
       expect(d['Title']).toBeDefined();
       expect(d['Image']).toBeDefined();
 
