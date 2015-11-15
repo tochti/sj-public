@@ -80,6 +80,7 @@ appServices.factory('Series', ['$http', '$q',
           var success = function (resp) {
             if (resp.data.Status === 'success') {
               that._id = resp.data.Data.ID;
+              that._image = resp.data.Data.Image;
               d.resolve(resp);
             }
 

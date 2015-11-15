@@ -1,4 +1,4 @@
-<div class="container">
+<div id="signin" class="container">
 
   <form class="form-signin">
     <h2 class="form-signin-heading">Please sign in</h2>
@@ -7,7 +7,7 @@
     <label for="pass" class="sr-only">Password</label>
     <input type="password" id="pass" class="form-control" placeholder="Password" ng-model="pass" required>
     <button class="btn btn-lg btn-primary btn-block" type="submit" ng-click="signIn()">Sign in</button>
-    <a ng-click="g.go2('/registrate')">Registrate</a>
+    <a id="go2-registrate" ng-click="g.go2('/registrate')">Registrate</a>
   </form>
 
 </div>
