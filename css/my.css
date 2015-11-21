@@ -12,6 +12,13 @@ body {
   z-index: 150;
 }
 
+#series-search {
+  width: 50%;
+  margin-right: auto;
+  margin-left: auto;
+  margin-bottom: 2.5em;
+}
+
 #series-list {
   overflow: hidden;
   list-style: none;
