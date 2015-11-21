@@ -97,6 +97,9 @@ appCtrl.controller('PageCtrl', [
         var s = new $scope.Series(data);
 
         var success = function (resp) {
+          console.log(resp);
+          s.data.image = resp.data.Data.Image;
+          s.data.id = resp.data.Data.ID;
           if (!seriesShelf.append(s)) {
             $scope.g.error('Cannot add series '+ s.Title +' to list');
             s.remove().then(function (){},
@@ -132,13 +135,11 @@ appCtrl.controller('OverviewCtrl', [
     var shelf = Shelf;
 
     $scope.seriesShelf = shelf.read("series");
-    $scope.watchedShelf = shelf.read("watched");
     $scope.user = User;
     $scope.Series = Series;
     $scope.g = G;
 
     var init = function () {
-      console.log($scope.user);
       if (!$scope.user.signedIn()) {
         $scope.g.go2("/signIn");
       }
@@ -158,9 +159,13 @@ appCtrl.controller('OverviewCtrl', [
 
 
       var success = function (wList) {
-        if (!$scope.watchedShelf.appendBatch(wList)) {
-          $scope.g.error('Cannot add '+ wList);
-        }
+        angular.forEach(wList, function (val, index) {
+          var i = $scope.seriesShelf.indexOfId(val.id());
+          if (i !== -1) {
+            $scope.seriesShelf.list[i].data.session = val.data.session;
+            $scope.seriesShelf.list[i].data.episode = val.data.episode;
+          }
+        });
       }
 
       $scope.g.readLastWatchedOfUser()
@@ -192,18 +197,15 @@ appCtrl.controller('OverviewCtrl', [
       });
 
       var updateSeries = function (data) {
-        data.SeriesID = that.series.id();
+        data.seriesId = that.series.id();
         var watched = new LastWatched(data);
 
         var success = function (resp) {
-          if (!$scope.watchedShelf.append(watched)) {
-            $scope.g.error('Cannot add data watched data to list');
-            watched.remove().then(function (){},
-              function (resp) {     
-                $scope.g.error(resp.data.Err); 
-              }
-            );
-          }
+          var i = $scope.seriesShelf.indexOfId(that.series.id());
+          $scope.seriesShelf.list[i].session = resp.data.Session;
+          $scope.seriesShelf.list[i].episode = resp.data.Episode;
+          that.series.session = resp.data.Session;
+          that.series.episode = resp.data.Episode;
         }
 
         var error = function (resp) {
@@ -253,8 +255,8 @@ appCtrl.controller('UpdateSeriesCtrl', [
     $scope.series = series;
     var readUpdateData = function () {
       var d = {
-        Session: $scope.session,
-        Episode: $scope.episode,
+        session: series.data.session,
+        episode: series.data.episode,
       };
 
       return d;

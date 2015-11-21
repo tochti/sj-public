@@ -48,76 +48,6 @@ describe('Services', function() {
 
   });
 
-  describe('Series', function () {
-
-    var $rootScope,
-        $s,
-        $httpBackend,
-        seriesTitle,
-        seriesID,
-        seriesImage,
-        seriesData;
-
-    beforeEach(inject(function ($injector) {
-      $httpBackend = $injector.get('$httpBackend');
-      $rootScope = $injector.get('$rootScope');
-      $s = $rootScope.$new();
-      $s.Series = $injector.get('Series');
-      seriesID = '123';
-      seriesTitle = 'Mr. Robot';
-      seriesImage = 'robot.png'
-      seriesData = {
-        ID: seriesID,
-        Title: seriesTitle,
-        Image: seriesImage,
-      };
-
-    }));
-
-    it('crud series', function (done) {
-      $httpBackend
-        .expectPOST('/Series')
-        .respond({
-          'Status': 'success', 
-          'Data': {
-            'ID': seriesID,
-            'Image': seriesImage,
-            'Title': seriesTitle
-          }
-        });
-
-      var series = new $s.Series(seriesData);
-      series.save().then(
-        function (resp) {
-          expect(series.id()).toBe(seriesID)
-        }
-      );
-
-      $httpBackend.flush();
-      $s.$apply();
-
-      var d = series.data();
-      console.log(d);
-      expect(d['Title']).toBeDefined();
-      expect(d['Image']).toBeDefined();
-
-      $httpBackend
-        .expectDELETE('/Series/'+ seriesID)
-        .respond({'Status': 'success', 'Data': {'ID': seriesID}});
-
-      series.remove().then(
-        function (resp) {
-          done();
-        }
-      );
-
-      $httpBackend.flush();
-      $s.$apply();
-
-    });
-
-  });
-
   describe('Shelf', function () {
 
     var $rootScope,
@@ -125,9 +55,7 @@ describe('Services', function() {
 
     var O = function (d) {
       var o = {
-        data: function () {
-          return d.data
-        },
+        data: d.data,
         id: function () {
           return d.id
         },
@@ -162,11 +90,11 @@ describe('Services', function() {
       var shelf = $s.shelf.read('test');
 
       expect(shelf.append(objs)).toBe(true);
-      expect(shelf.list()).toEqual(objs);
+      expect(shelf.list).toEqual(objs);
 
       var o = shelf.remove(obj1.id());
       expect(o).toEqual(obj1);
-      expect(shelf.list()).toEqual([obj2]);
+      expect(shelf.list).toEqual([obj2]);
 
       o = shelf.read(obj2.id());
       expect(o).toEqual(obj2);
@@ -179,7 +107,7 @@ describe('Services', function() {
       });
       shelf.update(obj2.id(), updated);
       o = shelf.read(obj2.id());
-      expect(o.data()).toEqual(updated.data());
+      expect(o.data).toEqual(updated.data);
 
       var r = shelf.find('Name', 'T');
       expect(r).toEqual([updated]);
@@ -247,7 +175,7 @@ describe('Services', function() {
           .respond(expectResp);
 
         g.readLastWatchedOfUser().then(function (wList) {
-          expect(wList[0].data().SeriesID).toEqual(1);
+          expect(wList[0].data.seriesId).toEqual(1);
           done();
         });
 

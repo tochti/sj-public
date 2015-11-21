@@ -65,12 +65,14 @@ appServices.factory('Series', ['$http', '$q',
 
       var series = {
         _urlPrefix: '/Series',
-        _id: data.ID || '',
-        _title: data.Title,
-        _image: data.Image,
+        data: {
+          id: data.ID || '',
+          title: data.Title,
+          image: data.Image,
+        },
 
         id: function () {
-          return this._id;
+          return this.data.id;
         },
 
         save: function () {
@@ -94,21 +96,13 @@ appServices.factory('Series', ['$http', '$q',
           var url = this._urlPrefix;
           var req = {
             Data: {
-              Title: this._title,
-              Image: this._image,
+              Title: this.data.title,
+              Image: this.data.image,
             },
           }
           $http.post(url, req).then(success, error);
 
           return d.promise;
-        },
-
-        data: function () {
-          return {
-            ID: this._id,
-            Title: this._title,
-            Image: this._image,
-          }
         },
 
         remove: function () {
@@ -146,11 +140,10 @@ appServices.factory('Shelf', [
   function () {
     var Shelf = function () {
       return {
-        _objs: [],
+        list: [],
         // Fügt ein Objekt der Liste hinzu
         // Das Objekt welches hinzugefügt wird muss folgende Funktionen besitzen
         // id() string
-        // data() {}
         //
         // append(obj {}) bool
         append: function (obj) {
@@ -176,11 +169,11 @@ appServices.factory('Shelf', [
           return ok;
         },
         appendOne: function (obj) {
-          if (typeof obj.id !== 'function' || typeof obj.data !== 'function') {
+          if (typeof obj.id !== 'function' || typeof obj.data !== 'object') {
             return false
           }
 
-          this._objs.push(obj);
+          this.list.push(obj);
           return true
         },
         // Entfernt ein Objekt mit der id X aus der Liste
@@ -193,17 +186,17 @@ appServices.factory('Shelf', [
             return {}
           }
 
-          return this._objs.splice(index, 1)[0];
+          return this.list.splice(index, 1)[0];
         },
         // Ersetzte ein Objekt durch ein geupdateds Objekt 
         update: function (id, updatedObj) {
           var i = this.indexOfId(id);
-          this._objs[i] = updatedObj;
+          this.list[i] = updatedObj;
         },
         // Findet die Position eines Objekts mit der id X
         indexOfId: function (id) {
           var found = -1;
-          angular.forEach(this._objs, function (val, index) {
+          angular.forEach(this.list, function (val, index) {
             if (id === val.id()) {
               found = index;
               return;
@@ -219,19 +212,15 @@ appServices.factory('Shelf', [
             return {}
           }
 
-          return this._objs[i];
-        },
-        // Gibt ein Array mit allen Objekten zurück
-        list: function () {
-          return this._objs;
+          return this.list[i];
         },
         // Findet ein Liste mit Objekten zurück im Feld X das Pattern Y haben.
         find: function(field, pattern) {
           var regx = new RegExp(pattern, 'i');
           var found = [];
 
-          angular.forEach(this._objs, function (val, i) {
-            if (val.data()[field].match(regx)) {
+          angular.forEach(this.list, function (val, i) {
+            if (val.data[field].match(regx)) {
               found.push(val);
             }
           });
@@ -261,20 +250,14 @@ appServices.factory('LastWatched', [
   function ($http, $q) {
      return function (data) {
       return {
-        _id: data.SeriesID,
-        _session: data.Session,
-        _episode: data.Episode,
-
-        id: function () {
-          return this._id;
+        data: {
+          seriesId: data.seriesId,
+          session: data.session,
+          episode: data.episode,
         },
 
-        data: function () {
-          return {
-            SeriesID: this._id,
-            Session: parseInt(this._session),
-            Episode: parseInt(this._episode),
-          }
+        id: function () {
+          return this.data.seriesId;
         },
 
         save: function () {
@@ -296,7 +279,11 @@ appServices.factory('LastWatched', [
 
           var url = '/LastWatched';
           var req = {
-            Data: this.data(),
+            Data: {
+              SeriesID: parseInt(this.data.seriesId),
+              Session: parseInt(this.data.session),
+              Episode: parseInt(this.data.episode),
+            }
           };
           $http.post(url, req).then(success, error);
 
@@ -329,7 +316,11 @@ appServices.factory('G', [
           }
 
           angular.forEach(resp.data.Data, function (val, index) {
-            wList.push(new LastWatched(val));
+            wList.push(new LastWatched({
+              seriesId: val.SeriesID,
+              session: val.Session,
+              episode: val.Episode,
+            }));
           });
 
 

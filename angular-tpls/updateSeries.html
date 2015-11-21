@@ -3,15 +3,15 @@
   <h4 class="modal-title" id="myModalLabel">Update series</h4>
 </div>
 <div class="modal-body">
-  <h2 class="series-title">{{ series.data().Title }}</h2>
+  <h2 class="series-title">{{ series.data.title }}</h2>
   <form>
     <div class="form-group">
-      <label for="title">Last session</label>
-      <input type="text" class="form-control" id="title" placeholder="Last session" ng-model="session">
+      <label for="title">Last season</label>
+      <input type="text" class="form-control" id="title" placeholder="Last session" ng-model="series.data.session">
     </div>
     <div class="form-group">
       <label for="title">Last episode</label>
-      <input type="text" class="form-control" id="image" placeholder="Last episode" ng-model="episode">
+      <input type="text" class="form-control" id="image" placeholder="Last episode" ng-model="series.data.episode">
     </div>
   </form>
 </div>
