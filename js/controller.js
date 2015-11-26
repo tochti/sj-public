@@ -227,6 +227,8 @@ appCtrl.controller('NewSeriesCtrl', [
   '$scope',
   '$modalInstance',
   function ($scope, $modalInstance) {
+    $scope.opened = true;
+
     var readSeriesData = function () {
       var d = {
         Title: $scope.title,
@@ -252,6 +254,7 @@ appCtrl.controller('UpdateSeriesCtrl', [
   '$modalInstance',
   'series',
   function ($scope, $modalInstance, series) {
+    $scope.opened = true;
     $scope.series = series;
     var readUpdateData = function () {
       var d = {
